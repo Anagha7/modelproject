@@ -1,4 +1,3 @@
-
 <html>
 <head>
 
@@ -147,19 +146,46 @@ img{ max-width:100%;}
   overflow-y: auto;
 }
 </style>
+<script>
+//use to choose the fn to change the var msg type and also to load the chat history
+  function load_chat(id)
+{
+  console.log("fuction reached");
+    id_prefix=id.substring(0,2);
+    if(id_prefix=="pm")
+    {
+     msg_type="private";
+     alert(msg_type+id_prefix);
 
+     }
+    else
+    {
+      msg_type="public";
+      alert(msg_type+id_prefix);
+
+      }
+
+
+
+}
+
+</script>
 </head>
 <body>
 <script type='text/javascript'>
 $(document).ready(function(){
 
-    var soc=io.connect('http://127.0.0.1:5000');
-    var soc_public=io('http://127.0.0.1:5000/public');
 
+    var soc=io.connect('http://127.0.0.1:5000');
+
+    var soc_private=io('http://127.0.0.1:5000/private');
+    var msg_type="public";
     console.log("script start");
 
     soc.on('connect',function(){
+
         soc.send("user has connected");
+
         console.log("connected");
     });
 
@@ -171,19 +197,40 @@ $(document).ready(function(){
         $(".msg_history").append(v);
         var elmnt = document.getElementById("s");
         elmnt.scrollIntoView();
+    });
 
-
-        console.log("Received message");
+    soc.on('inboxchat',function(users){
+          users.forEach(function(usr){
+            username=usr
+            var v=" <div class='chat_list'  id=pu_"+username+" onclick ='load_chat(this.id)'><div class='chat_people'><div class='chat_img'> <img src='https://ptetutorials.com/images/user-profile.png' alt="+username+"> </div> <div class='chat_ib'> <h5>"+username+" <span class='chat_date'>Dec 25</span></h5> <p>.....</p></div></div></div>"
+            $(".inbox_chat").append(v);
+            console.log(username);
+          });
+        console.log("usr added");
     });
 
 
-
+     $('#usr_send_btn').on('click',function(){
+        var user=$('#username').val();
+        console.log(user);
+        soc_private.emit('username',user);
+     });
 
 
      $('.msg_send_btn').on('click',function(){
         var msg=$('.write_msg').val();
-        soc_public.emit('usermessage',msg);
-        msg='';
+        console.log(msg_type)
+          if(msg_type=="private")
+          {
+              soc_private.emit('usermessage',msg);
+              }
+          else
+          {
+              alert("reached soc public")
+              soc_public.emit('usermessage',msg);
+
+              }
+
 
     });
 });
@@ -206,7 +253,7 @@ $(document).ready(function(){
             </div>
           </div>
           <div class="inbox_chat">
-            <div class="chat_list active_chat">
+            <div class="chat_list" id="testid">
               <div class="chat_people">
                 <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
                 <div class="chat_ib">
@@ -216,69 +263,11 @@ $(document).ready(function(){
                 </div>
               </div>
             </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
-            <div class="chat_list">
-              <div class="chat_people">
-                <div class="chat_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
-                <div class="chat_ib">
-                  <h5>Sunil Rajput <span class="chat_date">Dec 25</span></h5>
-                  <p>Test, which is a new approach to have all solutions
-                    astrology under one roof.</p>
-                </div>
-              </div>
-            </div>
+
           </div>
         </div>
         <div class="mesgs">
+
           <div class="msg_history">
             <div class="incoming_msg">
               <div class="incoming_msg_img"> <img src="https://ptetutorials.com/images/user-profile.png" alt="sunil"> </div>
@@ -323,6 +312,10 @@ $(document).ready(function(){
             <div class="input_msg_write">
               <input type="text" class="write_msg" placeholder="Type a message" />
               <button class="msg_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
+            </div>
+           <div class="input_msg_write">
+              <input type="text" id="username" placeholder="Type username" />
+              <button id="usr_send_btn" type="button"><i class="fa fa-paper-plane-o" aria-hidden="true"></i></button>
             </div>
           </div>
         </div>
